@@ -37,6 +37,9 @@ public abstract class Estabelecimento {
     private String telefone;
     private boolean estaAberto;
 
+    @Transient
+    private double distanciaEmKm;
+
     // Método auxiliar que simula o cálculo de distância (Haversine simplificado)
     public double calcularDistanciaAte(double latitudeUsuario, double longitudeUsuario) {
         double deltaLat = this.latitude - latitudeUsuario;

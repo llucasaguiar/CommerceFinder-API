@@ -24,4 +24,5 @@ public class EstabelecimentoResponseDTO {
     private double longitude;
     private String telefone;
     private boolean estaAberto;
+    private double distanciaEmKm;
 }

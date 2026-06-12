@@ -23,17 +23,6 @@ public class EstabelecimentoController {
 
     private final EstabelecimentoService estabelecimentoService;
 
-    @GetMapping("/buscar")
-    public ResponseEntity<List<Estabelecimento>> buscarEOrdenar(
-            @RequestParam(defaultValue = "distancia") String ordenarPor,
-            @RequestParam Double latitude,
-            @RequestParam Double longitude) {
-
-        List<Estabelecimento> resultado = estabelecimentoService.buscarEEstruturar(ordenarPor, latitude, longitude);
-
-        return ResponseEntity.ok(resultado);
-    }
-
     @PostMapping
     public ResponseEntity<EstabelecimentoResponseDTO> salvar(@Valid @RequestBody EstabelecimentoRequestDTO estabelecimentoRequestDTO) {
         log.info("Recebida requisição para criar novo estabelecimento: {}", estabelecimentoRequestDTO.getNome());
@@ -89,13 +78,20 @@ public class EstabelecimentoController {
         }
     }
 
-    @GetMapping("/buscar-ordenados")
-    public ResponseEntity<List<Estabelecimento>> listar(
+    @GetMapping("/ordenados")
+    public ResponseEntity<List<EstabelecimentoResponseDTO>> listarOrdenados(
             @RequestParam(value = "ordenarPor", defaultValue = "distancia") String ordenarPor,
             @RequestParam(value = "lat", required = false) Double latitude,
             @RequestParam(value = "lng", required = false) Double longitude) {
 
-        List<Estabelecimento> resultado = estabelecimentoService.listarEstabelecimentosOrdenados(ordenarPor, latitude, longitude);
+        log.info("Requisição recebida para listar ordenados por: {}", ordenarPor);
+
+        if ("distancia".equalsIgnoreCase(ordenarPor) && (latitude == null || longitude == null)) {
+            log.warn("Tentativa de ordenação por distância sem fornecer coordenadas geográficas.");
+            return ResponseEntity.badRequest().build();
+        }
+
+        List<EstabelecimentoResponseDTO> resultado = estabelecimentoService.listarComOrdenacao(ordenarPor, latitude, longitude);
         return ResponseEntity.ok(resultado);
     }
 

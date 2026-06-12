@@ -25,16 +25,6 @@ public class EstabelecimentoService {
     private final ContextoOrdenacao contextoOrdenacao;
     private final EstabelecimentoMapper estabelecimentoMapper;
 
-
-    public List<Estabelecimento> buscarEEstruturar(String ordenarPor, Double latitude, Double longitude) {
-
-        List<Estabelecimento> todosEstabelecimentos = estabelecimentoRepository.findAll();
-
-        OrdenacaoStrategy estrategia = contextoOrdenacao.obterEstrategia(ordenarPor);
-
-        return estrategia.ordenar(todosEstabelecimentos, latitude, longitude);
-    }
-
     @Transactional
     public EstabelecimentoResponseDTO salvar(EstabelecimentoRequestDTO estabelecimentoRequestDTO) {
         log.info("Salvando novo estabelecimento: {}", estabelecimentoRequestDTO.getNome());
@@ -105,13 +95,26 @@ public class EstabelecimentoService {
         }
     }
 
-    public List<Estabelecimento> listarEstabelecimentosOrdenados(String tipoOrdenacao, Double lat, Double lng) {
+    public List<EstabelecimentoResponseDTO> listarComOrdenacao(String ordenarPor, Double latitude, Double longitude) {
+        log.info("Buscando estabelecimentos ordenados por: {}", ordenarPor);
+        try {
+            List<Estabelecimento> estabelecimentos = estabelecimentoRepository.findAll();
 
-        List<Estabelecimento> listaBruta = estabelecimentoRepository.findAll();
+            OrdenacaoStrategy estrategia = contextoOrdenacao.obterEstrategia(ordenarPor);
 
-        OrdenacaoStrategy estrategia = contextoOrdenacao.obterEstrategia(tipoOrdenacao);
+            List<Estabelecimento> estabelecimentosOrdenados = estrategia.ordenar(estabelecimentos, latitude, longitude);
 
-        return estrategia.ordenar(listaBruta, lat, lng);
+            return estabelecimentosOrdenados.stream()
+                    .map(estabelecimentoMapper::toDTO)
+                    .collect(Collectors.toList());
+
+        } catch (IllegalArgumentException e) {
+            log.warn("Erro de validação na ordenação: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Falha ao listar estabelecimentos ordenados: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
 
