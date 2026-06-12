@@ -19,12 +19,9 @@ public class OrdenacaoPorDistancia implements OrdenacaoStrategy {
         }
         estabelecimentos.forEach(e -> {
             double dist = calcularDistancia(latitudeUsuario, longitudeUsuario, e.getLatitude(), e.getLongitude());
-
             dist = Math.round(dist * 100.0) / 100.0;
-
             e.setDistanciaEmKm(dist);
         });
-
         return estabelecimentos.stream()
                 .sorted(Comparator.comparing(e -> e.calcularDistanciaAte(latitudeUsuario, longitudeUsuario)))
                 .collect(Collectors.toList());
@@ -39,7 +36,6 @@ public class OrdenacaoPorDistancia implements OrdenacaoStrategy {
         final int R = 6371; // Raio da Terra em KM
         double latDistancia = Math.toRadians(latEstabelecimento - latUsuario);
         double lngDistancia = Math.toRadians(lngEstabelecimento - lngUsuario);
-
         double a = Math.sin(latDistancia / 2) * Math.sin(latDistancia / 2)
                 + Math.cos(Math.toRadians(latUsuario)) * Math.cos(Math.toRadians(latEstabelecimento))
                 * Math.sin(lngDistancia / 2) * Math.sin(lngDistancia / 2);

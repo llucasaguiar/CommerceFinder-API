@@ -61,11 +61,8 @@ public class EstabelecimentoService {
                 .map(estabelecimentoExistente -> {
                     log.debug("Dados atuais do estabelecimento: {}", estabelecimentoExistente);
                     log.debug("Novos dados recebidos: {}", estabelecimentoRequestDTO);
-
-                    // Usando a inteligência da Fábrica mapeada dentro do toEntity
                     Estabelecimento estabelecimentoParaAtualizar = estabelecimentoMapper.toEntity(estabelecimentoRequestDTO);
-                    estabelecimentoParaAtualizar.setId(id); // Garante a substituição no ID correto
-
+                    estabelecimentoParaAtualizar.setId(id);
                     Estabelecimento estabelecimentoSalvo = estabelecimentoRepository.save(estabelecimentoParaAtualizar);
                     log.info("Estabelecimento ID: {} atualizado com sucesso.", id);
                     return estabelecimentoSalvo;
@@ -99,11 +96,8 @@ public class EstabelecimentoService {
         log.info("Buscando estabelecimentos ordenados por: {}", ordenarPor);
         try {
             List<Estabelecimento> estabelecimentos = estabelecimentoRepository.findAll();
-
             OrdenacaoStrategy estrategia = contextoOrdenacao.obterEstrategia(ordenarPor);
-
             List<Estabelecimento> estabelecimentosOrdenados = estrategia.ordenar(estabelecimentos, latitude, longitude);
-
             return estabelecimentosOrdenados.stream()
                     .map(estabelecimentoMapper::toDTO)
                     .collect(Collectors.toList());
